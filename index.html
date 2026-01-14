@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tal & Maddie - Genetic Comparison</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+        :root {
+            --tal-color: #2563eb;
+            --tal-light: #dbeafe;
+            --maddie-color: #db2777;
+            --maddie-light: #fce7f3;
+            --both-color: #059669;
+            --both-light: #d1fae5;
+            --diff-color: #d97706;
+            --diff-light: #fef3c7;
+            --risk-low: #22c55e;
+            --risk-moderate: #f59e0b;
+            --risk-elevated: #ef4444;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 50%, #4a1942 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+
+        header .subtitle { opacity: 0.9; font-size: 1.1rem; }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .legend-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.tal { background: var(--tal-color); }
+        .legend-dot.maddie { background: var(--maddie-color); }
+        .legend-dot.same { background: var(--both-color); }
+        .legend-dot.different { background: var(--diff-color); }
+
+        nav {
+            background: var(--card-bg);
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            border-bottom: 1px solid var(--border);
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            list-style: none;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        nav a:hover { background: var(--bg); }
+
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        section { margin-bottom: 50px; }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--text);
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--both-color);
+            display: inline-block;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .comparison-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--border);
+        }
+
+        .comparison-card.same { border-left-color: var(--both-color); }
+        .comparison-card.different { border-left-color: var(--diff-color); }
+        .comparison-card.tal-advantage { border-left-color: var(--tal-color); }
+        .comparison-card.maddie-advantage { border-left-color: var(--maddie-color); }
+
+        .comparison-card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 15px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-same { background: var(--both-light); color: #047857; }
+        .badge-different { background: var(--diff-light); color: #b45309; }
+
+        .person-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .person-row:last-child { border-bottom: none; }
+
+        .person-label {
+            min-width: 70px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .person-label.tal { background: var(--tal-light); color: var(--tal-color); }
+        .person-label.maddie { background: var(--maddie-light); color: var(--maddie-color); }
+
+        .genotype {
+            font-family: 'Courier New', monospace;
+            background: #f1f5f9;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .risk-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .risk-low { background: var(--risk-low); }
+        .risk-moderate { background: var(--risk-moderate); }
+        .risk-elevated { background: var(--risk-elevated); }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .summary-table th,
+        .summary-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .summary-table th {
+            background: linear-gradient(135deg, #1e3a5f, #4a1942);
+            color: white;
+            font-weight: 600;
+        }
+
+        .summary-table th:nth-child(2) { background: var(--tal-color); }
+        .summary-table th:nth-child(3) { background: var(--maddie-color); }
+
+        .summary-table tr:hover { background: var(--bg); }
+
+        .highlight-box {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .highlight-shared {
+            background: linear-gradient(135deg, var(--both-light), #ecfdf5);
+            border: 1px solid #86efac;
+        }
+
+        .highlight-different {
+            background: linear-gradient(135deg, var(--diff-light), #fef9c3);
+            border: 1px solid #fcd34d;
+        }
+
+        .key-difference {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--diff-color);
+        }
+
+        .key-difference h4 {
+            color: var(--diff-color);
+            margin-bottom: 10px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--both-color);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        footer {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 50%, #4a1942 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 50px;
+        }
+
+        footer p { margin: 5px 0; }
+        footer .disclaimer { opacity: 0.7; font-size: 0.85rem; margin-top: 15px; }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 2rem; }
+            .comparison-grid { grid-template-columns: 1fr; }
+            nav ul { flex-direction: column; align-items: center; }
+            .legend { flex-direction: column; align-items: center; }
+        }
+
+        .accordion { cursor: pointer; }
+        .accordion::after { content: ' [+]'; font-size: 0.8rem; opacity: 0.6; }
+        .accordion.active::after { content: ' [-]'; }
+        .accordion-content { display: none; padding-top: 15px; }
+        .accordion-content.show { display: block; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Tal & Maddie</h1>
+        <p class="subtitle">Comprehensive Genetic Comparison Report</p>
+        <div class="legend">
+            <div class="legend-item"><div class="legend-dot tal"></div> Tal</div>
+            <div class="legend-item"><div class="legend-dot maddie"></div> Maddie</div>
+            <div class="legend-item"><div class="legend-dot same"></div> Same/Similar</div>
+            <div class="legend-item"><div class="legend-dot different"></div> Key Difference</div>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#pharma">Medications</a></li>
+            <li><a href="#cardio">Cardiovascular</a></li>
+            <li><a href="#metabolism">Metabolism</a></li>
+            <li><a href="#nutrition">Nutrition</a></li>
+            <li><a href="#methylation">Methylation</a></li>
+            <li><a href="#athletic">Athletic</a></li>
+            <li><a href="#sleep">Sleep</a></li>
+            <li><a href="#personality">Personality</a></li>
+            <li><a href="#longevity">Longevity</a></li>
+            <li><a href="#inflammation">Inflammation</a></li>
+            <li><a href="#supplements">Supplements</a></li>
+            <li><a href="#alerts">Key Alerts</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- OVERVIEW SECTION -->
+        <section id="overview">
+            <h2>Overview Comparison</h2>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-value">684K</div>
+                    <div class="stat-label">Tal's SNPs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">676K</div>
+                    <div class="stat-label">Maddie's SNPs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">~75%</div>
+                    <div class="stat-label">Shared Variants</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Key Differences</div>
+                </div>
+            </div>
+
+            <table class="summary-table">
+                <tr>
+                    <th>Category</th>
+                    <th>Tal</th>
+                    <th>Maddie</th>
+                </tr>
+                <tr>
+                    <td><strong>Sex</strong></td>
+                    <td>Male</td>
+                    <td>Female</td>
+                </tr>
+                <tr>
+                    <td><strong>Cardiovascular Risk (9p21)</strong></td>
+                    <td><span class="risk-indicator risk-moderate"></span> Intermediate (3/6 alleles)</td>
+                    <td><span class="risk-indicator risk-elevated"></span> Elevated (Max risk)</td>
+                </tr>
+                <tr>
+                    <td><strong>Clopidogrel Response</strong></td>
+                    <td><span class="risk-indicator risk-elevated"></span> AVOID - CYP2C19 *2/*17</td>
+                    <td><span class="risk-indicator risk-low"></span> Normal - CYP2C19 *1/*1</td>
+                </tr>
+                <tr>
+                    <td><strong>Lactose Tolerance</strong></td>
+                    <td><span class="risk-indicator risk-low"></span> Tolerant (G/A)</td>
+                    <td><span class="risk-indicator risk-elevated"></span> Intolerant (A/A)</td>
+                </tr>
+                <tr>
+                    <td><strong>Histamine Tolerance</strong></td>
+                    <td><span class="risk-indicator risk-elevated"></span> Intolerant (DAO TT)</td>
+                    <td><span class="risk-indicator risk-low"></span> Normal</td>
+                </tr>
+                <tr>
+                    <td><strong>Obesity Risk (FTO)</strong></td>
+                    <td><span class="risk-indicator risk-moderate"></span> Modest (T/A)</td>
+                    <td><span class="risk-indicator risk-elevated"></span> Elevated (A/A)</td>
+                </tr>
+                <tr>
+                    <td><strong>COMT (Stress Response)</strong></td>
+                    <td>Val/Met - Flexible "Intermediate"</td>
+                    <td>Met/Met - Slow "Worrier"</td>
+                </tr>
+                <tr>
+                    <td><strong>Chronotype</strong></td>
+                    <td>Morning (CLOCK AA)</td>
+                    <td>Evening tendency (CLOCK het)</td>
+                </tr>
+                <tr>
+                    <td><strong>Injury Risk (COL1A1)</strong></td>
+                    <td><span class="risk-indicator risk-low"></span> Normal (CC)</td>
+                    <td><span class="risk-indicator risk-moderate"></span> Moderate (CA)</td>
+                </tr>
+                <tr>
+                    <td><strong>Longevity (FOXO3)</strong></td>
+                    <td>TT - Not protective</td>
+                    <td>GT - One protective allele</td>
+                </tr>
+            </table>
+
+            <div class="highlight-shared">
+                <h4>What They Share</h4>
+                <ul>
+                    <li>Both are <strong>NAT2 slow acetylators</strong> - isoniazid hepatotoxicity risk</li>
+                    <li>Both have <strong>MTHFR compound heterozygous</strong> status - need methylated B-vitamins</li>
+                    <li>Both have <strong>OPRM1 AG</strong> - may need opioid dose adjustment</li>
+                    <li>Both are <strong>CYP1A2 fast metabolizers</strong> - caffeine beneficial</li>
+                    <li>Both are <strong>ACTN3 R/X</strong> - hybrid athletic potential</li>
+                    <li>Both have <strong>low celiac risk</strong> - DQ2/DQ8 negative</li>
+                    <li>Both have <strong>normal Factor V Leiden</strong> - no clotting mutation</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- PHARMACOGENOMICS SECTION -->
+        <section id="pharma">
+            <h2>Pharmacogenomics - Medication Response</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card different">
+                    <h3>CYP2C19 <span class="status-badge badge-different">CRITICAL DIFFERENCE</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            <span class="genotype">*2/*17</span> - Intermediate Metabolizer<br>
+                            <span class="risk-indicator risk-elevated"></span><strong>AVOID Clopidogrel (Plavix)</strong> - FDA Black Box Warning<br>
+                            Use ticagrelor or prasugrel instead
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            <span class="genotype">*1/*1</span> - Normal Metabolizer<br>
+                            <span class="risk-indicator risk-low"></span>Standard clopidogrel dosing is effective
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>CYP2D6 <span class="status-badge badge-same">SIMILAR</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div><span class="genotype">*1/*2</span> - Normal Metabolizer</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div><span class="genotype">*1/*1</span> - Normal Metabolizer</div>
+                    </div>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">Both have normal codeine, tramadol, and antidepressant metabolism</p>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>CYP1A2 - Caffeine <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div><span class="genotype">AA</span> - Fast Metabolizer</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div><span class="genotype">AA</span> - Fast Metabolizer</div>
+                    </div>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">Both clear caffeine quickly. Coffee is cardioprotective for fast metabolizers. Caffeine effective as ergogenic aid.</p>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>NAT2 - Acetylator Status <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div><span class="genotype">*5B/*7B</span> - Slow Acetylator</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>Slow Acetylator</div>
+                    </div>
+                    <p style="margin-top: 10px;"><span class="risk-indicator risk-elevated"></span><strong>Both:</strong> Isoniazid hepatotoxicity risk. Monitor liver function if TB treatment needed.</p>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>OPRM1 - Opioid Response <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div><span class="genotype">AG</span> - Reduced sensitivity</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div><span class="genotype">AG</span> - Reduced sensitivity</div>
+                    </div>
+                    <p style="margin-top: 10px;"><strong>Both:</strong> May need higher opioid doses for pain control. Inform anesthesiologist before surgery. Tapentadol/methadone may work better.</p>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>SLCO1B1 - Statin Transport <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div><span class="genotype">TT</span> - Normal</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div><span class="genotype">TT</span> - Normal</div>
+                    </div>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">Both have no elevated statin myopathy risk. Standard dosing.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CARDIOVASCULAR SECTION -->
+        <section id="cardio">
+            <h2>Cardiovascular Health</h2>
+
+            <div class="key-difference">
+                <h4>MAJOR DIFFERENCE: 9p21 Cardiovascular Locus</h4>
+                <p>This is one of the most replicated cardiovascular GWAS findings and represents a significant difference between Tal and Maddie.</p>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-card different">
+                    <h3>9p21 - Coronary Artery Disease <span class="status-badge badge-different">KEY DIFFERENCE</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            <span class="risk-indicator risk-moderate"></span><strong>Intermediate Risk</strong><br>
+                            3/6 risk alleles (all heterozygous)<br>
+                            ~1.3x CAD risk vs baseline
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            <span class="risk-indicator risk-elevated"></span><strong>ELEVATED Risk</strong><br>
+                            Maximum genetic risk load (all homozygous risk)<br>
+                            ~1.5-2x CAD risk vs baseline<br>
+                            <strong>Priority: Aggressive cardiovascular prevention</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>Factor V Leiden <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div><span class="risk-indicator risk-low"></span> Normal - No mutation</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div><span class="risk-indicator risk-low"></span> <span class="genotype">CC</span> - No mutation</div>
+                    </div>
+                    <p style="margin-top: 10px;">Both: No inherited clotting disorder. Standard VTE risk.</p>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>Prothrombin G20210A <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div><span class="risk-indicator risk-low"></span> Normal</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div><span class="risk-indicator risk-low"></span> Normal</div>
+                    </div>
+                </div>
+
+                <div class="comparison-card different">
+                    <h3>APOE <span class="status-badge badge-different">DIFFERENT</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            <strong>INCOMPLETE DATA</strong><br>
+                            rs429358 missing - recommend clinical test
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            <span class="genotype">E3/E3</span> (inferred)<br>
+                            Most common genotype - neutral CV/Alzheimer's risk
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>ACE/AGT - Blood Pressure <span class="status-badge badge-same">SIMILAR</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>All heterozygous - Elevated hypertension susceptibility<br>If needed: ARBs &gt; CCBs</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>ID heterozygous - Moderate BP influence<br>DASH diet beneficial</div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>LPA - Lipoprotein(a) <span class="status-badge badge-same">SIMILAR</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div><span class="risk-indicator risk-low"></span> Favorable - Low Lp(a) risk</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div><span class="risk-indicator risk-low"></span> No high-risk variants detected</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- METABOLISM SECTION -->
+        <section id="metabolism">
+            <h2>Metabolism & Weight Management</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card different">
+                    <h3>FTO - Obesity Risk <span class="status-badge badge-different">DIFFERENCE</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            <span class="genotype">TA</span> - Heterozygous<br>
+                            <span class="risk-indicator risk-moderate"></span> Modest obesity risk<br>
+                            ~1.5 kg higher avg weight
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            <span class="genotype">AA</span> - Homozygous risk<br>
+                            <span class="risk-indicator risk-elevated"></span> Elevated obesity risk<br>
+                            ~3 kg higher avg weight; increased appetite<br>
+                            <strong>Good news:</strong> FTO responds exceptionally well to high-protein diet and exercise
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>PPARG - Insulin Sensitivity <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div><span class="genotype">CC</span> Pro/Pro - Reduced insulin sensitivity</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div><span class="genotype">CC</span> Pro/Pro - Reduced insulin sensitivity</div>
+                    </div>
+                    <p style="margin-top: 10px;"><strong>Both:</strong> 16% increased T2D risk. Physical activity can nullify this genetic effect.</p>
+                </div>
+
+                <div class="comparison-card different">
+                    <h3>TCF7L2 - Diabetes Risk <span class="status-badge badge-different">DIFFERENT</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            <span class="genotype">CC/GG</span><br>
+                            <span class="risk-indicator risk-low"></span> PROTECTED - Normal diabetes risk
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            Heterozygous risk<br>
+                            <span class="risk-indicator risk-moderate"></span> Modestly increased T2D risk (~1.4x)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-different">
+                <h4>Metabolic Strategy Comparison</h4>
+                <table class="summary-table">
+                    <tr>
+                        <th>Strategy</th>
+                        <th>Tal</th>
+                        <th>Maddie</th>
+                    </tr>
+                    <tr>
+                        <td>Protein Target</td>
+                        <td>25-30% calories</td>
+                        <td>25-30% calories (higher priority)</td>
+                    </tr>
+                    <tr>
+                        <td>Exercise Priority</td>
+                        <td>Important</td>
+                        <td>Critical (FTO + TCF7L2)</td>
+                    </tr>
+                    <tr>
+                        <td>Carb Sensitivity</td>
+                        <td>Standard monitoring</td>
+                        <td>Limit refined carbs more strictly</td>
+                    </tr>
+                    <tr>
+                        <td>Meal Timing</td>
+                        <td>Front-load calories (morning person)</td>
+                        <td>Structured timing, avoid grazing</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- NUTRITION SECTION -->
+        <section id="nutrition">
+            <h2>Diet & Nutrition</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card different">
+                    <h3>LCT - Lactose Tolerance <span class="status-badge badge-different">OPPOSITE</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            <span class="genotype">G/A</span> - Lactase Persistent<br>
+                            <span class="risk-indicator risk-low"></span> Can digest dairy normally
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            <span class="genotype">AA</span> - Lactase Non-Persistent<br>
+                            <span class="risk-indicator risk-elevated"></span> Lactose Intolerant<br>
+                            Avoid: dairy milk, ice cream, soft cheese<br>
+                            OK: aged cheese, yogurt with cultures, lactase supplements
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>BCMO1 - Beta-Carotene Conversion <span class="status-badge badge-same">SIMILAR</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>Poor converter - eat preformed vitamin A</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>Low converter - don't rely on carrots</div>
+                    </div>
+                    <p style="margin-top: 10px;"><strong>Both need:</strong> Eggs, liver, fatty fish for vitamin A. Use retinyl palmitate, not beta-carotene supplements.</p>
+                </div>
+
+                <div class="comparison-card different">
+                    <h3>FADS1/2 - Omega-3 Conversion <span class="status-badge badge-different">DIFFERENT</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            Major alleles - Efficient converter<br>
+                            <span class="risk-indicator risk-low"></span> Excellent omega-3 supplement response
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            Moderate converter<br>
+                            <span class="risk-indicator risk-moderate"></span> Don't rely on plant ALA (flax/chia)<br>
+                            Need direct EPA/DHA from fish or algae
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>VDR - Vitamin D Receptor <span class="status-badge badge-same">SIMILAR</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>FokI AA - Reduced receptor<br>Need 4000-6000 IU D3 + K2 + Mg</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>VDR variants present<br>Need 2000-4000 IU D3 + K2</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-different">
+                <h4>Diet Summary</h4>
+                <table class="summary-table">
+                    <tr>
+                        <th>Food Category</th>
+                        <th>Tal</th>
+                        <th>Maddie</th>
+                    </tr>
+                    <tr>
+                        <td>Dairy</td>
+                        <td><span class="risk-indicator risk-low"></span> Can enjoy freely</td>
+                        <td><span class="risk-indicator risk-elevated"></span> Avoid/limit</td>
+                    </tr>
+                    <tr>
+                        <td>Aged Cheese, Wine, Fermented</td>
+                        <td><span class="risk-indicator risk-elevated"></span> Limit (histamine)</td>
+                        <td><span class="risk-indicator risk-low"></span> No genetic restriction</td>
+                    </tr>
+                    <tr>
+                        <td>Coffee</td>
+                        <td><span class="risk-indicator risk-low"></span> Beneficial (3-4 cups OK)</td>
+                        <td><span class="risk-indicator risk-low"></span> Beneficial (3-4 cups OK)</td>
+                    </tr>
+                    <tr>
+                        <td>High-Protein</td>
+                        <td><span class="risk-indicator risk-low"></span> Recommended (25-30%)</td>
+                        <td><span class="risk-indicator risk-low"></span> Essential (25-30%)</td>
+                    </tr>
+                    <tr>
+                        <td>Fatty Fish</td>
+                        <td><span class="risk-indicator risk-low"></span> Good responder</td>
+                        <td><span class="risk-indicator risk-low"></span> Critical source</td>
+                    </tr>
+                    <tr>
+                        <td>Gluten</td>
+                        <td><span class="risk-indicator risk-low"></span> Very low celiac risk</td>
+                        <td><span class="risk-indicator risk-low"></span> Very low celiac risk</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- METHYLATION SECTION -->
+        <section id="methylation">
+            <h2>Methylation & Detoxification</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card same">
+                    <h3>MTHFR <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            C677T + A1298C - Compound Heterozygous<br>
+                            45-50% enzyme activity
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            <span class="genotype">CT</span> + <span class="genotype">AC</span> - Compound Heterozygous<br>
+                            40-50% enzyme activity
+                        </div>
+                    </div>
+                    <p style="margin-top: 10px;"><strong>Both need:</strong> Methylfolate (L-5-MTHF) + methylcobalamin. Test homocysteine levels.</p>
+                </div>
+
+                <div class="comparison-card different">
+                    <h3>COMT - Catecholamine Clearance <span class="status-badge badge-different">KEY DIFFERENCE</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            <span class="genotype">GA</span> Val/Met - Intermediate<br>
+                            "Flexible" - balanced stress response<br>
+                            Adapts well to varying stress levels
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            <span class="genotype">AA</span> Met/Met - Slow COMT<br>
+                            "Worrier" phenotype<br>
+                            Better working memory, more stress-sensitive<br>
+                            Slower estrogen clearance (important for women)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>CBS - Transsulfuration <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>Normal - no sulfur restriction needed</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>Normal - no sulfur restriction needed</div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>GST Genes - Phase II Detox <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>Present/Functional - Good detox capacity</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>GSTM1/GSTT1/GSTP1 Present - Intact glutathione pathways</div>
+                    </div>
+                </div>
+
+                <div class="comparison-card different">
+                    <h3>SOD2 - Antioxidant <span class="status-badge badge-different">DIFFERENT</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            rs4880 <span class="genotype">AA</span> - Efficient<br>
+                            30-40% higher activity
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            Heterozygous<br>
+                            Moderate mitochondrial antioxidant capacity
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ATHLETIC SECTION -->
+        <section id="athletic">
+            <h2>Athletic Performance</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card same">
+                    <h3>ACTN3 - Muscle Fiber Type <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div><span class="genotype">R/X</span> - Hybrid profile</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div><span class="genotype">RX</span> - Hybrid profile</div>
+                    </div>
+                    <p style="margin-top: 10px;"><strong>Both:</strong> Balanced power/endurance. Versatile athletic potential. Hybrid training works well.</p>
+                </div>
+
+                <div class="comparison-card different">
+                    <h3>COL1A1 - Collagen/Injury Risk <span class="status-badge badge-different">DIFFERENT</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            <span class="genotype">CC</span> - Normal<br>
+                            <span class="risk-indicator risk-low"></span> Standard injury risk<br>
+                            Low bone fracture risk
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            <span class="genotype">CA</span> - Heterozygous<br>
+                            <span class="risk-indicator risk-moderate"></span> Moderate soft tissue injury risk<br>
+                            ACL, Achilles, rotator cuff vulnerability<br>
+                            <strong>Needs:</strong> Extended warm-ups, collagen + vit C, adequate recovery
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>ACE - Athletic Performance <span class="status-badge badge-same">SIMILAR</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>GA - Intermediate/Versatile</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>ID heterozygous - Mixed</div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>Caffeine as Ergogenic Aid <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>CYP1A2 AA - Effective performance enhancer</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>CYP1A2 AA - Effective performance enhancer</div>
+                    </div>
+                    <p style="margin-top: 10px;"><strong>Both:</strong> 200-400mg caffeine 30-60 min before workout improves performance.</p>
+                </div>
+            </div>
+
+            <table class="summary-table">
+                <tr>
+                    <th>Training Aspect</th>
+                    <th>Tal</th>
+                    <th>Maddie</th>
+                </tr>
+                <tr>
+                    <td>Best Training Style</td>
+                    <td>Concurrent (don't specialize early)</td>
+                    <td>Hybrid (strength + cardio)</td>
+                </tr>
+                <tr>
+                    <td>Injury Prevention</td>
+                    <td>Standard protocols</td>
+                    <td>Extra attention - extended warm-ups, recovery</td>
+                </tr>
+                <tr>
+                    <td>Pre-Workout Caffeine</td>
+                    <td>Effective</td>
+                    <td>Effective</td>
+                </tr>
+                <tr>
+                    <td>Protein Needs</td>
+                    <td>1.6-2.2 g/kg</td>
+                    <td>1.6-2.2 g/kg (higher priority - FTO)</td>
+                </tr>
+                <tr>
+                    <td>Joint Support</td>
+                    <td>Standard</td>
+                    <td>Collagen peptides + vitamin C recommended</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- SLEEP SECTION -->
+        <section id="sleep">
+            <h2>Sleep & Circadian Rhythm</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card different">
+                    <h3>CLOCK Gene - Chronotype <span class="status-badge badge-different">OPPOSITE</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            rs1801260 <span class="genotype">AA</span><br>
+                            <strong>Morning chronotype</strong><br>
+                            Optimal wake: 6-7 AM<br>
+                            Optimal sleep: 9:30-10:30 PM<br>
+                            Peak performance: Morning to early afternoon<br>
+                            Shift work tolerance: LOW
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            Heterozygous<br>
+                            <strong>Evening preference tendency</strong><br>
+                            May naturally prefer later bedtimes<br>
+                            More flexibility in schedule
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>MTNR1B - Melatonin Sensitivity <span class="status-badge badge-same">SIMILAR</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>rs10830963 <span class="genotype">CC</span> - Normal melatonin sensitivity</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>No significant variants - normal</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-different">
+                <h4>Sleep Compatibility Note</h4>
+                <p>Tal is genetically a morning person while Maddie tends toward evenings. For shared schedules:</p>
+                <ul>
+                    <li>Compromise on bedtime around 10-10:30 PM</li>
+                    <li>Tal will naturally wake earlier - can use quiet morning time productively</li>
+                    <li>Plan important joint activities for mid-day when both are at good energy</li>
+                    <li>Maddie may adapt to earlier schedule more easily than Tal to later</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- PERSONALITY SECTION -->
+        <section id="personality">
+            <h2>Personality & Neurotransmitters</h2>
+
+            <div class="highlight-shared" style="background: #f8fafc; border-color: #94a3b8;">
+                <p><strong>Note:</strong> Personality is ~40-50% genetic, ~50-60% environmental. These genes influence tendencies, not destinies.</p>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-card different">
+                    <h3>COMT - Dopamine Style <span class="status-badge badge-different">KEY DIFFERENCE</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            <span class="genotype">GA</span> Val/Met - "Intermediate"<br>
+                            Flexible stress response<br>
+                            Adapts to both high and low pressure<br>
+                            Balanced between focus and flexibility
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            <span class="genotype">AA</span> Met/Met - "Worrier"<br>
+                            Better working memory and attention to detail<br>
+                            More thorough and methodical<br>
+                            Performs best in lower-stress environments<br>
+                            Benefits from stress management practices
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>BDNF - Neuroplasticity <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>Val/Val <span class="genotype">CC</span> - Optimal neuroplasticity</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>Val/Val - Normal BDNF secretion</div>
+                    </div>
+                    <p style="margin-top: 10px;"><strong>Both:</strong> Full neuroplasticity benefits from exercise. Good learning capacity.</p>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>DRD2/DRD4 - Dopamine Receptors <span class="status-badge badge-same">SIMILAR</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>Normal - good D2 availability, lower addiction risk</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>Normal - no novelty-seeking 7-repeat</div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>MAO-A <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>Normal/high activity (NOT "warrior gene")</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>Normal activity variant</div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>SLC6A4 - Serotonin Transporter <span class="status-badge badge-same">SIMILAR</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>rs25532 <span class="genotype">GG</span> - Normal</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>Intermediate length - balanced</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-different">
+                <h4>Relationship Dynamic Insight</h4>
+                <p><strong>Tal (Intermediate COMT)</strong> can handle varying stress levels and may help stabilize during high-pressure situations.</p>
+                <p><strong>Maddie (Slow COMT)</strong> excels at detailed analysis and sustained attention, but benefits from a calmer environment.</p>
+                <p><strong>Complementary:</strong> Tal can help manage external stress; Maddie brings thoroughness and attention to detail. Both have good neuroplasticity and balanced dopamine systems.</p>
+            </div>
+        </section>
+
+        <!-- LONGEVITY SECTION -->
+        <section id="longevity">
+            <h2>Longevity & Aging</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card different">
+                    <h3>FOXO3 - Longevity Gene <span class="status-badge badge-different">DIFFERENT</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            rs2802292 <span class="genotype">TT</span><br>
+                            NOT protective variant<br>
+                            <strong>Needs:</strong> Intermittent fasting, exercise, heat exposure to activate FOXO3 pathway
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            rs2802292 <span class="genotype">GT</span><br>
+                            One copy of longevity allele<br>
+                            Modest genetic longevity contribution
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>TERT - Telomerase <span class="status-badge badge-same">SIMILAR</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            rs2736100 <span class="genotype">CA</span> - Intermediate<br>
+                            rs2736098 <span class="genotype">CC</span> - Favorable
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            No high-impact variants<br>
+                            Normal telomere maintenance
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card different">
+                    <h3>APOE - Alzheimer's Risk <span class="status-badge badge-different">DATA DIFFERENCE</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            <strong>INCOMPLETE</strong> - rs429358 missing<br>
+                            Recommend clinical APOE testing if desired
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            E3/E3 (inferred)<br>
+                            Population-average Alzheimer's risk<br>
+                            No E4 allele detected
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INFLAMMATION SECTION -->
+        <section id="inflammation">
+            <h2>Inflammation & Histamine</h2>
+
+            <div class="key-difference">
+                <h4>MAJOR DIFFERENCE: Histamine Tolerance</h4>
+                <p>This is one of the most practically significant differences for daily food choices.</p>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-card different">
+                    <h3>DAO - Histamine Metabolism <span class="status-badge badge-different">OPPOSITE</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>
+                            rs10156191 <span class="genotype">TT</span><br>
+                            <span class="risk-indicator risk-elevated"></span><strong>SEVERELY REDUCED DAO</strong> (49%+ reduction)<br>
+                            Histamine intolerance risk<br>
+                            <strong>May react to:</strong> aged cheese, wine, fermented foods, cured meats<br>
+                            Consider DAO supplements before histamine-rich meals
+                        </div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>
+                            <span class="risk-indicator risk-low"></span><strong>Normal DAO</strong><br>
+                            No histamine intolerance risk<br>
+                            No need to limit histamine-rich foods
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>HNMT - Secondary Histamine Pathway <span class="status-badge badge-same">SIMILAR</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>rs1050891 <span class="genotype">AG</span> - Moderately reduced</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>Normal</div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>IL6 - Inflammation <span class="status-badge badge-same">SIMILAR</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>Variants present - Moderate-high inflammatory tendency</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>Heterozygous GC - Moderate response</div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>TNF-alpha <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>rs1800629 <span class="genotype">GG</span> - Protective</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div><span class="genotype">GG</span> - Standard, not elevated</div>
+                    </div>
+                </div>
+
+                <div class="comparison-card same">
+                    <h3>HLA - Celiac Risk <span class="status-badge badge-same">SAME</span></h3>
+                    <div class="person-row">
+                        <span class="person-label tal">Tal</span>
+                        <div>DQ2/DQ8 negative - VERY LOW celiac risk</div>
+                    </div>
+                    <div class="person-row">
+                        <span class="person-label maddie">Maddie</span>
+                        <div>DQ2/DQ8 not detected - VERY LOW celiac risk</div>
+                    </div>
+                    <p style="margin-top: 10px;"><strong>Both:</strong> Can eat gluten without celiac concern. (Non-celiac gluten sensitivity still possible but unrelated to genetics.)</p>
+                </div>
+            </div>
+
+            <div class="highlight-different">
+                <h4>Dining Together - Practical Notes</h4>
+                <table class="summary-table">
+                    <tr>
+                        <th>Food</th>
+                        <th>Tal</th>
+                        <th>Maddie</th>
+                    </tr>
+                    <tr>
+                        <td>Aged Cheese</td>
+                        <td><span class="risk-indicator risk-elevated"></span> Limit</td>
+                        <td><span class="risk-indicator risk-elevated"></span> Limit (lactose)</td>
+                    </tr>
+                    <tr>
+                        <td>Fresh Cheese</td>
+                        <td><span class="risk-indicator risk-low"></span> OK</td>
+                        <td><span class="risk-indicator risk-elevated"></span> Avoid (lactose)</td>
+                    </tr>
+                    <tr>
+                        <td>Wine</td>
+                        <td><span class="risk-indicator risk-moderate"></span> May trigger histamine</td>
+                        <td><span class="risk-indicator risk-low"></span> No genetic issue</td>
+                    </tr>
+                    <tr>
+                        <td>Sauerkraut/Kimchi</td>
+                        <td><span class="risk-indicator risk-elevated"></span> Avoid (histamine)</td>
+                        <td><span class="risk-indicator risk-low"></span> Fine</td>
+                    </tr>
+                    <tr>
+                        <td>Fresh Fish</td>
+                        <td><span class="risk-indicator risk-low"></span> Great</td>
+                        <td><span class="risk-indicator risk-low"></span> Great</td>
+                    </tr>
+                    <tr>
+                        <td>Cured Meats</td>
+                        <td><span class="risk-indicator risk-elevated"></span> Avoid</td>
+                        <td><span class="risk-indicator risk-low"></span> Fine</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- SUPPLEMENTS SECTION -->
+        <section id="supplements">
+            <h2>Supplement Comparison</h2>
+
+            <table class="summary-table">
+                <tr>
+                    <th>Supplement</th>
+                    <th>Tal</th>
+                    <th>Maddie</th>
+                </tr>
+                <tr>
+                    <td><strong>Methylfolate (L-5-MTHF)</strong></td>
+                    <td>400-800 mcg (MTHFR)</td>
+                    <td>400-800 mcg (MTHFR)</td>
+                </tr>
+                <tr>
+                    <td><strong>Methylcobalamin B12</strong></td>
+                    <td>1000 mcg (MTHFR + FUT2)</td>
+                    <td>1000 mcg (MTHFR + FUT2)</td>
+                </tr>
+                <tr>
+                    <td><strong>Vitamin D3</strong></td>
+                    <td>4000-6000 IU + K2 + Mg (VDR)</td>
+                    <td>2000-4000 IU + K2 (VDR)</td>
+                </tr>
+                <tr>
+                    <td><strong>Omega-3 EPA/DHA</strong></td>
+                    <td>Good responder (FADS efficient)</td>
+                    <td>1-2g/day essential (FADS moderate)</td>
+                </tr>
+                <tr>
+                    <td><strong>Vitamin A (Retinol)</strong></td>
+                    <td>Preformed sources (BCMO1)</td>
+                    <td>2500-5000 IU retinyl palmitate (BCMO1)</td>
+                </tr>
+                <tr>
+                    <td><strong>Calcium</strong></td>
+                    <td>From dairy (tolerant)</td>
+                    <td>500-600mg citrate (lactose intolerant)</td>
+                </tr>
+                <tr>
+                    <td><strong>Magnesium</strong></td>
+                    <td>Glycinate - recommended</td>
+                    <td>Glycinate 200-400mg - essential (COMT)</td>
+                </tr>
+                <tr>
+                    <td><strong>DAO Enzyme</strong></td>
+                    <td>Before histamine-rich meals (DAO TT)</td>
+                    <td>Not needed</td>
+                </tr>
+                <tr>
+                    <td><strong>Collagen + Vit C</strong></td>
+                    <td>Standard recommendation</td>
+                    <td>10-15g/day (COL1A1 injury risk)</td>
+                </tr>
+                <tr>
+                    <td><strong>CoQ10</strong></td>
+                    <td>Optional CV support</td>
+                    <td>100-200mg recommended (9p21 high risk)</td>
+                </tr>
+            </table>
+
+            <div class="highlight-shared">
+                <h4>Shared Supplement Protocol</h4>
+                <ul>
+                    <li>Both need methylated B-vitamins (methylfolate + methylcobalamin)</li>
+                    <li>Both need vitamin D3 with K2</li>
+                    <li>Both need preformed vitamin A (not beta-carotene)</li>
+                    <li>Both benefit from omega-3 (Maddie more critically)</li>
+                    <li>Both should AVOID folic acid and cyanocobalamin</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- KEY ALERTS SECTION -->
+        <section id="alerts">
+            <h2>Critical Alerts Summary</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card tal-advantage">
+                    <h3>Tal's Unique Concerns</h3>
+                    <ul>
+                        <li><span class="risk-indicator risk-elevated"></span><strong>AVOID Clopidogrel</strong> (CYP2C19 *2/*17)</li>
+                        <li><span class="risk-indicator risk-elevated"></span><strong>Histamine intolerance</strong> - limit aged/fermented foods</li>
+                        <li><span class="risk-indicator risk-moderate"></span>APOE incomplete - consider clinical test</li>
+                        <li><span class="risk-indicator risk-moderate"></span>FOXO3 TT - needs lifestyle activation</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card maddie-advantage">
+                    <h3>Maddie's Unique Concerns</h3>
+                    <ul>
+                        <li><span class="risk-indicator risk-elevated"></span><strong>9p21 maximum risk</strong> - aggressive CV prevention</li>
+                        <li><span class="risk-indicator risk-elevated"></span><strong>Lactose intolerant</strong> - avoid dairy</li>
+                        <li><span class="risk-indicator risk-elevated"></span><strong>FTO homozygous</strong> - weight management priority</li>
+                        <li><span class="risk-indicator risk-moderate"></span>COL1A1 - injury prevention important</li>
+                        <li><span class="risk-indicator risk-moderate"></span>COMT slow - stress management essential</li>
+                        <li><span class="risk-indicator risk-moderate"></span>TCF7L2 - T2D risk monitoring</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="comparison-card same" style="margin-top: 20px;">
+                <h3>Shared Medical Alerts - Print for Both</h3>
+                <div style="border: 2px solid var(--both-color); padding: 20px; background: white; margin-top: 15px;">
+                    <h4 style="color: var(--both-color); margin-bottom: 15px;">TAL & MADDIE - SHARED GENETIC ALERTS</h4>
+                    <table style="width: 100%;">
+                        <tr><td><strong>NAT2:</strong></td><td>Both Slow Acetylators - Isoniazid hepatotoxicity risk</td></tr>
+                        <tr><td><strong>OPRM1:</strong></td><td>Both AG - May need opioid dose adjustment for pain control</td></tr>
+                        <tr><td><strong>MTHFR:</strong></td><td>Both Compound Heterozygous - Use methylfolate, not folic acid</td></tr>
+                        <tr><td><strong>CYP1A2:</strong></td><td>Both Fast - Caffeine safe and beneficial</td></tr>
+                        <tr><td><strong>Factor V:</strong></td><td>Both Negative - No inherited clotting disorder</td></tr>
+                        <tr><td><strong>Celiac:</strong></td><td>Both Low Risk - DQ2/DQ8 negative</td></tr>
+                    </table>
+                    <p style="margin-top: 15px; font-size: 0.85rem; color: #666;">Generated: January 2026 | Consumer genetic test - confirm significant findings clinically</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Limitations & Disclaimer</h2>
+            <div class="comparison-card">
+                <ul>
+                    <li>Genetic variants indicate statistical associations, not certainties</li>
+                    <li>Most variants have small effect sizes (1.1-1.5x risk changes)</li>
+                    <li>Lifestyle factors often have larger effects than genetics</li>
+                    <li>Consumer genetic tests are not clinically validated for diagnosis</li>
+                    <li>This comparison is for educational purposes only</li>
+                    <li>Consult healthcare providers before making medical decisions</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <h3>Tal & Maddie - Genetic Comparison</h3>
+        <p>Tal: 684,396 SNPs | Maddie: 676,368 SNPs | GRCh38 Assembly</p>
+        <p class="disclaimer">Generated January 2026 | For educational purposes only | Not medical advice</p>
+        <p style="margin-top: 15px; font-size: 0.85rem;">Data Source: SelfDecode</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.accordion').forEach(item => {
+            item.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const content = this.nextElementSibling;
+                content.classList.toggle('show');
+            });
+        });
+    </script>
+</body>
+</html>
