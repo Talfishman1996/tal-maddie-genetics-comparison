@@ -309,7 +309,6 @@
         @media (max-width: 768px) {
             header h1 { font-size: 2rem; }
             .comparison-grid { grid-template-columns: 1fr; }
-            nav ul { flex-direction: column; align-items: center; }
             .legend { flex-direction: column; align-items: center; }
         }
 
@@ -318,9 +317,269 @@
         .accordion.active::after { content: ' [-]'; }
         .accordion-content { display: none; padding-top: 15px; }
         .accordion-content.show { display: block; }
+
+        /* Mobile Navigation */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 1001;
+        }
+
+        .hamburger-icon {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: #6366f1;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .hamburger-icon::before,
+        .hamburger-icon::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 2px;
+            background: #6366f1;
+            transition: transform 0.3s;
+        }
+
+        .hamburger-icon::before { top: -8px; }
+        .hamburger-icon::after { top: 8px; }
+
+        .menu-toggle[aria-expanded="true"] .hamburger-icon {
+            background: transparent;
+        }
+
+        .menu-toggle[aria-expanded="true"] .hamburger-icon::before {
+            transform: rotate(45deg) translate(5px, 6px);
+        }
+
+        .menu-toggle[aria-expanded="true"] .hamburger-icon::after {
+            transform: rotate(-45deg) translate(5px, -6px);
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            nav ul {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            nav.menu-open ul {
+                display: flex;
+            }
+
+            nav ul li {
+                width: 100%;
+            }
+
+            nav a {
+                display: block;
+                width: 100%;
+                padding: 12px 16px;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            nav ul li:last-child a {
+                border-bottom: none;
+            }
+        }
+
+        /* iOS Safari Sticky Fix */
+        nav {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+
+        html, body {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Skip Link for Accessibility */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #6366f1;
+            color: white;
+            padding: 8px 16px;
+            z-index: 1000;
+            transition: top 0.3s;
+            text-decoration: none;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        a:focus, button:focus, input:focus {
+            outline: 2px solid #6366f1;
+            outline-offset: 2px;
+        }
+
+        /* Touch Targets */
+        nav a, button, .card, .comparison-card {
+            min-height: 44px;
+        }
+
+        @media (max-width: 768px) {
+            nav a {
+                padding: 12px 16px;
+            }
+        }
+
+        /* Responsive Tables */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            table {
+                font-size: 0.875rem;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+
+        /* Card Grid Responsive */
+        @media (max-width: 768px) {
+            .grid, [style*="grid"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            .comparison-card {
+                padding: 12px;
+            }
+        }
+
+        /* Typography Scaling */
+        html {
+            font-size: clamp(14px, 2.5vw, 16px);
+        }
+
+        h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); }
+        h2 { font-size: clamp(1.25rem, 3vw, 1.75rem); }
+        h3 { font-size: clamp(1.1rem, 2.5vw, 1.5rem); }
+
+        /* Collapsible Section Indicator */
+        h2[aria-expanded]::after {
+            content: ' ▼';
+            font-size: 0.75em;
+            transition: transform 0.3s;
+        }
+
+        h2[aria-expanded="false"]::after {
+            content: ' ▶';
+        }
+
+        /* Dark Mode */
+        .dark-mode {
+            --bg-color: #1a1a2e;
+            --text-color: #e5e5e5;
+            --card-bg: #16213e;
+            --border-color: #374151;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .dark-mode nav,
+        .dark-mode .toolbar,
+        .dark-mode .card,
+        .dark-mode .comparison-card,
+        .dark-mode section {
+            background: var(--card-bg);
+            border-color: var(--border-color);
+        }
+
+        .dark-mode table {
+            background: var(--card-bg);
+        }
+
+        .dark-mode th {
+            background: #1e3a5f;
+        }
+
+        .dark-mode td {
+            border-color: var(--border-color);
+        }
+
+        .dark-mode .toolbar {
+            background: #0f172a;
+        }
+
+        .dark-mode #gene-search {
+            background: #1e293b;
+            border-color: #374151;
+            color: #e5e5e5;
+        }
+
+        .dark-mode #diff-toggle {
+            background: #4f46e5;
+        }
+
+        .dark-mode .summary-table {
+            background: var(--card-bg);
+        }
+
+        .dark-mode .summary-table tr:hover {
+            background: #1e293b;
+        }
+
+        .dark-mode .highlight-box,
+        .dark-mode .highlight-shared,
+        .dark-mode .highlight-different {
+            background: #1e293b;
+            border-color: var(--border-color);
+        }
+
+        .dark-mode .key-difference {
+            background: var(--card-bg);
+        }
+
+        .dark-mode .stat-card {
+            background: var(--card-bg);
+        }
+
+        .dark-mode .person-label.tal {
+            background: #1e40af;
+            color: #93c5fd;
+        }
+
+        .dark-mode .person-label.maddie {
+            background: #9d174d;
+            color: #fbcfe8;
+        }
+
+        .dark-mode .genotype {
+            background: #334155;
+            color: #e5e5e5;
+        }
+
+        .dark-mode header,
+        .dark-mode footer {
+            background: linear-gradient(135deg, #0f172a 0%, #1a1a2e 50%, #2d1f3d 100%);
+        }
     </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <header>
         <h1>Tal & Maddie</h1>
         <p class="subtitle">Comprehensive Genetic Comparison Report</p>
@@ -333,6 +592,9 @@
     </header>
 
     <nav>
+        <button class="menu-toggle" aria-expanded="false" aria-label="Toggle navigation menu">
+            <span class="hamburger-icon"></span>
+        </button>
         <ul>
             <li><a href="#overview">Overview</a></li>
             <li><a href="#pharma">Medications</a></li>
@@ -350,7 +612,13 @@
         </ul>
     </nav>
 
-    <main>
+    <div class="toolbar" style="display: flex; gap: 8px; padding: 12px 20px; background: #f8fafc; border-bottom: 1px solid #e5e7eb; flex-wrap: wrap; align-items: center;">
+        <input type="search" id="gene-search" placeholder="Search genes..." aria-label="Search genes" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; flex: 1; min-width: 150px;">
+        <button id="diff-toggle" data-active="false" style="padding: 8px 16px; background: #6366f1; color: white; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;">Show Differences Only</button>
+        <button id="dark-mode-toggle" aria-label="Toggle dark mode" style="padding: 8px 12px; background: white; border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer;">&#127769;</button>
+    </div>
+
+    <main id="main-content">
         <!-- OVERVIEW SECTION -->
         <section id="overview">
             <h2>Overview Comparison</h2>
@@ -1501,11 +1769,90 @@
     </footer>
 
     <script>
+        // Accordion functionality
         document.querySelectorAll('.accordion').forEach(item => {
             item.addEventListener('click', function() {
                 this.classList.toggle('active');
                 const content = this.nextElementSibling;
                 content.classList.toggle('show');
+            });
+        });
+
+        // Mobile menu toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const nav = document.querySelector('nav');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+                menuToggle.setAttribute('aria-expanded', !expanded);
+                nav.classList.toggle('menu-open');
+            });
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('gene-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                document.querySelectorAll('.comparison-card, .card, table tr').forEach(el => {
+                    const text = el.textContent.toLowerCase();
+                    if (el.tagName === 'TR' && el.querySelector('th')) return;
+                    el.style.display = text.includes(query) || query === '' ? '' : 'none';
+                });
+            });
+        }
+
+        // Show differences only toggle
+        const diffToggle = document.getElementById('diff-toggle');
+        if (diffToggle) {
+            diffToggle.addEventListener('click', () => {
+                const showingDiffs = diffToggle.getAttribute('data-active') === 'true';
+                diffToggle.setAttribute('data-active', !showingDiffs);
+                diffToggle.textContent = showingDiffs ? 'Show Differences Only' : 'Show All';
+
+                document.querySelectorAll('.comparison-card, .card').forEach(card => {
+                    const isSame = card.classList.contains('same') ||
+                                   card.querySelector('.same') ||
+                                   card.textContent.includes('SAME') ||
+                                   card.textContent.includes('Same');
+                    if (!showingDiffs && isSame) {
+                        card.style.display = 'none';
+                    } else {
+                        card.style.display = '';
+                    }
+                });
+            });
+        }
+
+        // Dark mode toggle
+        const darkToggle = document.getElementById('dark-mode-toggle');
+        if (darkToggle) {
+            const isDark = localStorage.getItem('darkMode') === 'true';
+            if (isDark) document.body.classList.add('dark-mode');
+
+            darkToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            });
+        }
+
+        // Collapsible sections
+        document.querySelectorAll('h2').forEach(header => {
+            header.style.cursor = 'pointer';
+            header.setAttribute('role', 'button');
+            header.setAttribute('aria-expanded', 'true');
+
+            const section = header.closest('section');
+            const content = section ? Array.from(section.children).filter(el => el !== header) : [];
+
+            header.addEventListener('click', () => {
+                const expanded = header.getAttribute('aria-expanded') === 'true';
+                header.setAttribute('aria-expanded', !expanded);
+                content.forEach(el => {
+                    el.style.display = expanded ? 'none' : '';
+                });
+                header.style.opacity = expanded ? '0.7' : '1';
             });
         });
     </script>
